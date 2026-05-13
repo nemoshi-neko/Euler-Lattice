@@ -11,6 +11,7 @@ let activeNotes = new Set<string>();
 const synths = new Map();
 
 let euler_mode = false;
+let modulo_mode = false;
 
 async function initAudio() {
     if (!audioStarted) { 
@@ -29,24 +30,42 @@ const power = (f, e) => {
     const r = { n: Math.pow(f.n, Math.abs(e)), d: Math.pow(f.d, Math.abs(e)) };
     return e > 0 ? simplify(r.n, r.d) : simplify(r.d, r.n);
 };
-const modepower = (dx,rx) => {
-    let exp = {
-        n: 0 * dx*rx.n + rx.d * 1,
-        d: 1 * rx.d,
-    }
-    return exp;
-}
 
 function setDirection(x,y){
-  let dx = Number(x)-center.x;
-  let dy = center.y-Number(y);
-  switch(Compass){
-    case 0:/*[dx,dy] = [ dx, dy];*/break;
-    case 1:  [dx,dy] = [-dy, dx];  break;
-    case 2:  [dx,dy] = [-dx,-dy];  break;
-    case 3:  [dx,dy] = [ dy,-dx];  break;
-  }
-  return [dx,dy];
+    let dx = Number(x)-center.x;
+    let dy = center.y-Number(y);
+    switch(Compass){
+        case 0:/*[dx,dy] = [ dx, dy];*/break;
+        case 1:  [dx,dy] = [-dy, dx];  break;
+        case 2:  [dx,dy] = [-dx,-dy];  break;
+        case 3:  [dx,dy] = [ dy,-dx];  break;
+    }
+    return [dx,dy];
+}
+
+const calc_freq = (rat,dx, dy, rx, ry, xPower,yPower) => {
+    let freq = base_f * (rat.n / rat.d);
+    
+    if(xPower) freq *= Math.pow(2, dx * rx.n / rx.d);
+    if(yPower) freq *= Math.pow(2, dy * ry.n / ry.d);
+
+    if(modulo_mode) freq = modulo_freq(freq);
+
+    return freq;
+}
+
+const modulo_normalize = (rat) => {
+    if(!rat.n || !rat.d) return rat;
+    while(rat.n / rat.d < 0.5) rat.n*=2;
+    while(rat.n / rat.d > 2) rat.d*=2;
+    return simplify(rat.n,rat.d);
+}
+
+const modulo_freq = (freq) =>{
+  const under_f = base_f /2;
+  const ratio = freq / under_f;
+  const octaves = Math.log2(ratio);
+  return under_f * Math.pow(2, ((octaves % 2) +2) %2);
 }
 
 const update = () =>{
@@ -71,31 +90,22 @@ const update = () =>{
         const [x,y] = pos.split(',');
         const [dx,dy] = setDirection(x,y);
         
-
         let rat = { n: 1, d: 1 };
-        let exp = { n: 0, d: 1 };
 
-        if(xPower) exp = modepower(dx, rx);
-        else rat = multiply(rat , power(rx, dx));
-        if(yPower) exp = modepower(dy, ry);
-        else rat = multiply(rat , power(ry, dy));
+        if(!xPower) rat = multiply(rat , power(rx, dx));
+        if(!yPower) rat = multiply(rat , power(ry, dy));
+        if(modulo_mode) rat = modulo_normalize(rat);
         
-        const simpleExp = simplify(exp.n,exp.d);
-
-        const freq = (base_f 
-            *Math.pow(rx.n / rx.d, xPower ? 0 : dx)
-            *Math.pow(2, xPower ? (dx*rx.n / rx.d) : 0)
-            *Math.pow(ry.n / ry.d, yPower ? 0 : dy)
-            *Math.pow(2, yPower ? (dy*ry.n / ry.d) : 0)
-        );
-        (cell as HTMLElement).dataset.freq = String(freq);
+        const freq = calc_freq(rat, dx,dy,rx,ry,xPower,yPower);
+        
 
         if(xPower === yPower){
             if(xPower) tpow.textContent = `P(${dx},${dy})`;
             else tpow.textContent = '';
         }else tpow.textContent = `P(${xPower ? dx : dy})`;
+        (cell as HTMLElement).dataset.freq = String(freq);
 
-        if(rat.n === 1 && rat.d === 1 && simpleExp.n && simpleExp.d){
+        if(rat.n === 1 && rat.d === 1){
             ratio_n.textContent = '';
             ratio_d.textContent = '';
         }else{
@@ -203,6 +213,11 @@ function rotate() {
 }
 
 // Control
+const refresh = () => {
+  update();
+  refreshNotes();
+}
+
 window.addEventListener('keydown', (e) => {
     if (e.key.startsWith('Arrow')) e.preventDefault();
     if(!euler_mode){
@@ -221,19 +236,24 @@ window.addEventListener('keydown', (e) => {
             case 'ArrowRight': center.x++; break;
             case 'r': Compass === 3 ? Compass = 0 : Compass++; break;
         }
-        update();
-        refreshNotes();
+        refresh();
     }
 });
 
 const le_toggle = document.getElementById('l/e-toggle');
-
-document.getElementById('update-btn').onclick = update;
 le_toggle.addEventListener('click', () =>{
     const isActive = le_toggle.classList.toggle('is-active');
     euler_mode = isActive;
 })
 
+const modulo_toggle = document.getElementById('modulo-toggle');
+modulo_toggle.addEventListener('click', () =>{
+    const isActive = modulo_toggle.classList.toggle('is-active');
+    modulo_mode = isActive;
+})
+
+
+document.getElementById('update-btn').onclick = refresh;
 setup();
 
 /*
