@@ -250,6 +250,7 @@ const modulo_toggle = document.getElementById('modulo-toggle');
 modulo_toggle.addEventListener('click', () =>{
     const isActive = modulo_toggle.classList.toggle('is-active');
     modulo_mode = isActive;
+    refresh();
 })
 
 
@@ -258,5 +259,4 @@ setup();
 
 /*
 ドラッグ移動
-modulo対応
 */

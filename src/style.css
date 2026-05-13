@@ -1,17 +1,14 @@
 :root {
-    /*
-    --base: #7f5072;
-    --accent: #dbcbc7;
-    --sub: #acb0a8;
-    */
+    --background: oklch(25.33% .016 252.42);
+    --button: oklch(58% .233 277.117);
+    --active: oklch(65% .241 354.308);
+    --content: oklch(96% .018 272.314);
+    --sub: oklch(29% .066 243.157);
     --size: 11;
-    --base: #0b0e14;
-    --accent: #f0f0f0;
-    --sub: #444444;
 }
 
 body{
-    background-color: var(--base);
+    background-color: var(--background);
     color: var(--accent);
     font-family: "Segoe UI", system-ui, sans-serif;
     margin:0;
@@ -20,6 +17,11 @@ body{
     align-items:center;
     height:100vh;
     overflow:hidden;
+}
+
+input{
+    background-color: var(--content);
+    border: 0px;
 }
 
 .ctrl-panel {
@@ -36,10 +38,29 @@ body{
     z-index:100;
 }
 
+@media screen and (max-width: 1200px) {
+    body{
+        flex-direction: column;
+    }
+    .ctrl-panel{
+        height:auto;
+    }
+}
+
 .ratio-inputs {
     display:flex;
     gap: 15px;
     align-items: center;
+    color: var(--content)
+}
+
+.input-group {
+    display:flex;
+    flex-direction: column;
+}
+
+.num {
+    border-bottom: 1px solid var(--background);
 }
 
 #grid {
@@ -52,20 +73,20 @@ body{
 }
 
 .cell {
-    background: var(--sub);
-    color: var(--base);
+    background: none;
+    color: var(--content);
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.1s ease;
-    border: 2px solid transparent;
+    border: 1px solid var(--content);
 }
 
 .cell.active {
-    background: var(--accent);
-    color: #000;
+    background: var(--active);
+    color: var(--content);
     font-weight: bold;
     transform: scale(0.96);
 }
@@ -80,18 +101,16 @@ body{
 
 .btn {
     padding: 10px 20px;
-    background-color: #eee;
-    border: 1px solid #ccc;
+    background-color: var(--button);
+    border: 1px solid var(--button);
     cursor: pointer;
     transition: 0.3s;
   }
 
   .btn.is-active {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--active);
+    color: var(--content);
   }
-.ratio_n { font-size: 1.1rem; border-bottom:#000 1px solid}
+.ratio_n { font-size: 1.1rem; border-bottom:var(--content) 1px solid}
 .ratio_d { font-size: 1.1rem; }
-.freq { font-size: 0.65rem; color: var(--text-dim); }
-.cell.active .freq { color: #333; }
-.legend { font-size: 0.8rem; color: var(--text-dim); }
+.legend { font-size: 0.8rem; color: var(--content); }
