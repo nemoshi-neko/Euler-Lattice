@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>Euler Lattice</title>
+        <link rel="stylesheet" href="src/style.css" type="text/css">
+    </head>
+    <body>
+        <div class="ctrl-panel">
+            <div class="ratio-inputs">
+                <div class="input-group">
+                    <label>X軸比率</label>
+                    <input type="number" id="x-num" value="3"> / 
+                    <input type="number" id="x-den" value="2">
+                    <div>2^<input type="checkbox" id="x-chk"></div>
+                </div>
+                <div class="input-group">
+                    <label>Y軸比率:</label>
+                    <input type="number" id="y-num" value="5"> / 
+                    <input type="number" id="y-den" value="4">
+                    <div>2^<input type="checkbox" id="y-chk"></div>
+                </div>
+            </div>
+            <button id="update-btn" class="btn">update / reset</button>
+            <button id="l/e-toggle" class="btn">Lagrange / Euler</button>
+            <div class="legend">
+                <span>[矢印キー]: 移動</span> | 
+                <span>[R]: 90度回転</span>
+            </div>
+        </div>
+        
+
+        <div id="grid-wrapper">
+            <div id="grid">
+              <!--GRID_PLACEHOLDER-->
+            </div>
+        </div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>

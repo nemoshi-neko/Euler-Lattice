@@ -1,0 +1,97 @@
+:root {
+    /*
+    --base: #7f5072;
+    --accent: #dbcbc7;
+    --sub: #acb0a8;
+    */
+    --size: 11;
+    --base: #0b0e14;
+    --accent: #f0f0f0;
+    --sub: #444444;
+}
+
+body{
+    background-color: var(--base);
+    color: var(--accent);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    margin:0;
+    display:flex;
+    flex-direction:row-reverse;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+}
+
+.ctrl-panel {
+    background: var(--sub);
+    color: var(--base);
+    width: 100%;
+    height: 100vh;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    align-items:normal;
+    justify-content: center;
+    gap:10px;
+    z-index:100;
+}
+
+.ratio-inputs {
+    display:flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#grid {
+    display:grid;
+    grid-template-columns: repeat(var(--size), 70px);
+    grid-template-rows: repeat(var(--size), 70px);
+    gap:4px;
+    padding:20px;
+    user-select: none;
+}
+
+.cell {
+    background: var(--sub);
+    color: var(--base);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    border: 2px solid transparent;
+}
+
+.cell.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: bold;
+    transform: scale(0.96);
+}
+
+.ratio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .btn.is-active {
+    background-color: #4CAF50;
+    color: white;
+  }
+.ratio_n { font-size: 1.1rem; border-bottom:#000 1px solid}
+.ratio_d { font-size: 1.1rem; }
+.freq { font-size: 0.65rem; color: var(--text-dim); }
+.cell.active .freq { color: #333; }
+.legend { font-size: 0.8rem; color: var(--text-dim); }
