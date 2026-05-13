@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: 'Euler Lattice',
+  base: '/Euler-Lattice/',
   plugins: [
     {
       name: 'generate-grid',
