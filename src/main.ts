@@ -22,16 +22,16 @@ async function initAudio() {
 }
 
 // 更新プログラム
-const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-const simplify = (n, d) => { const g = Math.abs(gcd(n, d)); return { n: n / g, d: d / g }; };
-const multiply = (a, b) => simplify(a.n * b.n, a.d * b.d);
-const power = (f, e) => {
+const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+const simplify = (n: number, d: number) => { const g = Math.abs(gcd(n, d)); return { n: n / g, d: d / g }; };
+const multiply = (a: any, b: any) => simplify(a.n * b.n, a.d * b.d);
+const power = (f: any, e: any) => {
     if (e === 0) return { n: 1, d: 1 };
     const r = { n: Math.pow(f.n, Math.abs(e)), d: Math.pow(f.d, Math.abs(e)) };
     return e > 0 ? simplify(r.n, r.d) : simplify(r.d, r.n);
 };
 
-function setDirection(x,y){
+function setDirection(x: number,y: number){
     let dx = Number(x)-center.x;
     let dy = center.y-Number(y);
     switch(Compass){
@@ -43,7 +43,7 @@ function setDirection(x,y){
     return [dx,dy];
 }
 
-const calc_freq = (rat,dx, dy, rx, ry, xPower,yPower) => {
+const calc_freq = (rat:any,dx:number, dy:number, rx: any, ry: any, xPower: boolean,yPower: boolean) => {
     let freq = base_f * (rat.n / rat.d);
     
     if(xPower) freq *= Math.pow(2, dx * rx.n / rx.d);
@@ -54,14 +54,14 @@ const calc_freq = (rat,dx, dy, rx, ry, xPower,yPower) => {
     return freq;
 }
 
-const modulo_normalize = (rat) => {
+const modulo_normalize = (rat: any) => {
     if(!rat.n || !rat.d) return rat;
     while(rat.n / rat.d < 0.5) rat.n*=2;
     while(rat.n / rat.d > 2) rat.d*=2;
     return simplify(rat.n,rat.d);
 }
 
-const modulo_freq = (freq) =>{
+const modulo_freq = (freq: number) =>{
   const under_f = base_f /2;
   const ratio = freq / under_f;
   const octaves = Math.log2(ratio);
@@ -87,8 +87,8 @@ const update = () =>{
         const ratio_n = cell.querySelector('.ratio_n');
         const ratio_d = cell.querySelector('.ratio_d');
         
-        const [x,y] = pos.split(',');
-        const [dx,dy] = setDirection(x,y);
+        const [x,y] = pos!.split(',');
+        const [dx,dy] = setDirection(Number(x),Number(y));
         
         let rat = { n: 1, d: 1 };
 
@@ -100,17 +100,17 @@ const update = () =>{
         
 
         if(xPower === yPower){
-            if(xPower) tpow.textContent = `P(${dx},${dy})`;
-            else tpow.textContent = '';
-        }else tpow.textContent = `P(${xPower ? dx : dy})`;
+            if(xPower) tpow!.textContent = `P(${dx},${dy})`;
+            else tpow!.textContent = '';
+        }else tpow!.textContent = `P(${xPower ? dx : dy})`;
         (cell as HTMLElement).dataset.freq = String(freq);
 
         if(rat.n === 1 && rat.d === 1){
-            ratio_n.textContent = '';
-            ratio_d.textContent = '';
+            ratio_n!.textContent = '';
+            ratio_d!.textContent = '';
         }else{
-            ratio_n.textContent = `${rat.n}`;
-            ratio_d.textContent = `${rat.d}`;
+            ratio_n!.textContent = `${rat.n}`;
+            ratio_d!.textContent = `${rat.d}`;
         }
     });
 }
@@ -118,7 +118,7 @@ const update = () =>{
 const setup = () => {
     document.querySelectorAll('.cell').forEach(cell => {
         cell.addEventListener('click', () => {
-            const [x, y] = (cell as HTMLElement).dataset.pos
+            const [x, y] = (cell as HTMLElement)!.dataset.pos
                 .split(',')
                 .map(Number);
 
@@ -133,13 +133,13 @@ const setup = () => {
 };
 
 // 音
-function play(x,y){
+function play(x:number,y:number){
     if(!audioStarted) initAudio();
     const key = `${x},${y}`;
     if(synths.has(key)) return;
     const cell = document.querySelector(`[data-pos="${key}"]`);
     if(!cell) return;
-    const freq = parseFloat((cell as HTMLElement).dataset.freq);
+    const freq = parseFloat((cell as HTMLElement)!.dataset.freq);
 
     const synth = new Tone.Synth({
         oscillator: {type: 'triangle'},
@@ -152,7 +152,7 @@ function play(x,y){
     document.querySelector(`[data-pos="${key}"]`)?.classList.add('active');
 }
 
-function stop(x,y){
+function stop(x:number,y:number){
     const key = `${x},${y}`;
     if(synths.has(key)){
         const s = synths.get(key);
@@ -170,7 +170,7 @@ function refreshNotes(){
         if(!synth) return;
         const cell = document.querySelector(`[data-pos="${key}"]`);
         if(!cell) return;
-        const freq = parseFloat((cell as HTMLElement).dataset.freq);
+        const freq = parseFloat((cell as HTMLElement)!.dataset.freq);
         synth.frequency.rampTo(freq, 0.05);
     })
 }
@@ -194,7 +194,7 @@ function transform(trans_func){
     activeNotes = nextSet;
 }
 
-function shift(dx, dy) {
+function shift(dx:number, dy:number) {
     transform(notes => 
         notes.map(([x, y]) => [x + dx, y + dy])
     );
@@ -256,7 +256,3 @@ modulo_toggle.addEventListener('click', () =>{
 
 document.getElementById('update-btn').onclick = refresh;
 setup();
-
-/*
-ドラッグ移動
-*/
