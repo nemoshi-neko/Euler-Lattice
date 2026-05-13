@@ -118,9 +118,7 @@ const update = () =>{
 const setup = () => {
     document.querySelectorAll('.cell').forEach(cell => {
         cell.addEventListener('click', () => {
-            const [x, y] = (cell as HTMLElement)!.dataset.pos
-                .split(',')
-                .map(Number);
+            const [x, y] = ((cell as HTMLElement).dataset.pos || "").split(',').map(Number);
 
             if (!cell.classList.contains('active')) {
                 play(x, y);
@@ -139,7 +137,7 @@ function play(x:number,y:number){
     if(synths.has(key)) return;
     const cell = document.querySelector(`[data-pos="${key}"]`);
     if(!cell) return;
-    const freq = parseFloat((cell as HTMLElement)!.dataset.freq);
+    const freq = parseFloat((cell as HTMLElement)!.dataset.freq || "0");
 
     const synth = new Tone.Synth({
         oscillator: {type: 'triangle'},
@@ -170,24 +168,24 @@ function refreshNotes(){
         if(!synth) return;
         const cell = document.querySelector(`[data-pos="${key}"]`);
         if(!cell) return;
-        const freq = parseFloat((cell as HTMLElement)!.dataset.freq);
+        const freq = parseFloat((cell as HTMLElement)!.dataset.freq || "0");
         synth.frequency.rampTo(freq, 0.05);
     })
 }
 
 // 操作関連
-function transform(trans_func){
+function transform(trans_func: (notes: number[][]) => number[][] ){
     if(!activeNotes.size) return;
     const currentNotesArr = Array.from(activeNotes).map(c => c.split(',').map(Number));
     const nextNotesArr = trans_func(currentNotesArr);
-    const canMove = nextNotesArr.every(([nx,ny]) => 
+    const canMove = nextNotesArr.every(([nx,ny]: number[]) => 
         nx >= 0 && nx < size && ny >= 0 && ny < size
     );
     if(!canMove) return;
 
     currentNotesArr.forEach(([x,y]) => stop(x,y));
     const nextSet = new Set<string>();
-    nextNotesArr.forEach(([nx,ny]) => {
+    nextNotesArr.forEach(([nx,ny]: number[]) => {
         nextSet.add(`${nx},${ny}`);
         play(nx, ny);
     });
@@ -196,14 +194,14 @@ function transform(trans_func){
 
 function shift(dx:number, dy:number) {
     transform(notes => 
-        notes.map(([x, y]) => [x + dx, y + dy])
+        notes.map(([x, y]: number[]) => [x + dx, y + dy])
     );
 }
 
 function rotate() {
     transform(notes => {
-        const avgX = notes.reduce((sum, [x]) => sum + x, 0) / notes.length;
-        const avgY = notes.reduce((sum, [, y]) => sum + y, 0) / notes.length;
+        const avgX = notes.reduce((sum:number, [x]:number[]) => sum + x, 0) / notes.length;
+        const avgY = notes.reduce((sum:number, [, y]:number[]) => sum + y, 0) / notes.length;
 
         return notes.map(([x, y]) => [
             Math.round(avgX - (y - avgY)),
@@ -241,18 +239,18 @@ window.addEventListener('keydown', (e) => {
 });
 
 const le_toggle = document.getElementById('l/e-toggle');
-le_toggle.addEventListener('click', () =>{
-    const isActive = le_toggle.classList.toggle('is-active');
+le_toggle!.addEventListener('click', () =>{
+    const isActive = le_toggle!.classList.toggle('is-active');
     euler_mode = isActive;
 })
 
 const modulo_toggle = document.getElementById('modulo-toggle');
-modulo_toggle.addEventListener('click', () =>{
-    const isActive = modulo_toggle.classList.toggle('is-active');
+modulo_toggle!.addEventListener('click', () =>{
+    const isActive = modulo_toggle!.classList.toggle('is-active');
     modulo_mode = isActive;
     refresh();
 })
 
 
-document.getElementById('update-btn').onclick = refresh;
+document.getElementById('update-btn')!.onclick = refresh;
 setup();
