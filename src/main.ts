@@ -1,4 +1,6 @@
 import * as Tone from 'tone'
+import './style.css';
+
 const size=11
 const size_half = Math.floor(size/2)
 let center = { x: size_half, y: size_half };
